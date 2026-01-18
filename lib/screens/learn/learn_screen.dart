@@ -1,3 +1,4 @@
+import 'package:campy/shared/widgets/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class LearnScreen extends StatefulWidget {
@@ -14,8 +15,10 @@ class _LearnScreenState extends State<LearnScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Top Header Section
@@ -23,13 +26,19 @@ class _LearnScreenState extends State<LearnScreen> {
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 0,
+                  bottom: 110, // Adjust this based on your navbar height + gap
+                ),
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
                     // Vertical List of Lessons
                     ListView.builder(
                       shrinkWrap: true,
+                      padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: 10,
                       itemBuilder: (context, index) {
@@ -46,6 +55,10 @@ class _LearnScreenState extends State<LearnScreen> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+        child: CustomBottomBar(currentIndex: 3, onTap: (value) {}),
       ),
     );
   }

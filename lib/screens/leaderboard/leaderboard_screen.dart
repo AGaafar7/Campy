@@ -1,3 +1,4 @@
+import 'package:campy/shared/widgets/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class LeaderboardScreen extends StatelessWidget {
@@ -6,6 +7,7 @@ class LeaderboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -69,10 +71,16 @@ class LeaderboardScreen extends StatelessWidget {
                 _buildLeaderboardRow("8", "Ricardo Veum", "32 kudos", false),
                 _buildLeaderboardRow("9", "Gary Sanford", "31 kudos", false),
                 _buildLeaderboardRow("10", "Becky Bartell", "30 kudos", false),
+                _buildLeaderboardRow("10", "Becky Bartell", "30 kudos", false),
+                _buildLeaderboardRow("10", "Becky Bartell", "30 kudos", false),
               ],
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+        child: CustomBottomBar(currentIndex: 2, onTap: (value) {}),
       ),
     );
   }

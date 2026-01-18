@@ -1,3 +1,4 @@
+import 'package:campy/shared/widgets/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class CoursesExploreScreen extends StatefulWidget {
@@ -112,6 +113,10 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
               ),
             ],
           ),
+        ),
+        bottomNavigationBar: CustomBottomBar(
+          currentIndex: 1,
+          onTap: (value) {},
         ),
       ),
     );
