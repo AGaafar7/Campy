@@ -30,7 +30,7 @@ class CustomBottomBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(40),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -56,7 +56,7 @@ class CustomBottomBar extends StatelessWidget {
           Positioned(
             bottom: 40,
             child: GestureDetector(
-              onTap: () => onTap(4), // Special index for the bird
+              onTap: () => onTap(4),
               child: Container(
                 height: 70,
                 width: 70,
@@ -65,7 +65,7 @@ class CustomBottomBar extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
