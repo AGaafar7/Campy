@@ -1,4 +1,5 @@
 import 'package:campy/screens/leaderboard/leaderboard_screen.dart';
+import 'package:campy/style_manager.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,7 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+      themeMode: ThemeMode.system,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       home: const LeaderboardScreen(),
     );
   }
