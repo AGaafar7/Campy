@@ -159,8 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           final String token = decoded['data']['token'];
                           final String userId = decoded['data']['userId'];
-                          AppState().token = token;
-                          AppState().userID = userId;
+                          AppState().updateUserData(userId, token);
 
                           debugPrint('TOKEN: $token');
                           debugPrint('USER ID: $userId');

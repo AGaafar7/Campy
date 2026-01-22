@@ -23,7 +23,7 @@ Future<http.Response> signIn(User user) {
 ///Sign out
 Future<http.Response> signOut(String token) {
   return http.post(
-    Uri.parse("$baseUrl/auth/sign-in"),
+    Uri.parse("$baseUrl/auth/sign-out"),
     headers: {"Authorization": "Bearer $token"},
   );
 }
