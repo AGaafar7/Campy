@@ -10,6 +10,7 @@ class User {
     required this.password,
     required this.kudos,
   });
+  
   Map<String, dynamic> toMap() {
     return {'name': name, 'email': email, 'password': password, 'kudos': kudos};
   }

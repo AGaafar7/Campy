@@ -1,5 +1,12 @@
+import 'dart:convert';
+
+import 'package:campy/api/campy_backend_manager.dart';
+import 'package:campy/app_state.dart';
 import 'package:campy/screens/auth/register_screen.dart';
+import 'package:campy/screens/navigation_manager_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,6 +16,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  bool? isRememberMe = false;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -57,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 20.0),
                   child: TextField(
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       filled: true,
@@ -74,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 8),
                   child: TextField(
+                    controller: passwordController,
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -92,7 +104,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 0),
                   child: Row(
                     children: [
-                      Checkbox.adaptive(value: false, onChanged: (value) {}),
+                      Checkbox.adaptive(
+                        value: isRememberMe,
+                        onChanged: (value) {
+                          setState(() {
+                            isRememberMe = value;
+                          });
+                        },
+                      ),
                       Text("Remember me", textScaler: TextScaler.linear(0.7)),
                       Spacer(),
                       Text("Forgot Password ?"),
@@ -114,7 +133,54 @@ class _LoginScreenState extends State<LoginScreen> {
                       maximumSize: WidgetStatePropertyAll(Size(350, 45)),
                       fixedSize: WidgetStatePropertyAll(Size(350, 45)),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (emailController.text.isEmpty ||
+                          passwordController.text.isEmpty ||
+                          isRememberMe == false ||
+                          isRememberMe == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please fill in all fields'),
+                          ),
+                        );
+                      } else {
+                        //TODO: think about how will the name be exported through out the app instead of always calling the backend then navigate to home with the correct user
+                        User user = User(
+                          name: "",
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
+                          kudos: "0",
+                        );
+                        http.Response response = await signIn(user);
+                        if (response.statusCode == 200) {
+                          final Map<String, dynamic> decoded = jsonDecode(
+                            response.body,
+                          );
+
+                          final String token = decoded['data']['token'];
+                          final String userId = decoded['data']['userId'];
+                          AppState().token = token;
+                          AppState().userID = userId;
+
+                          debugPrint('TOKEN: $token');
+                          debugPrint('USER ID: $userId');
+                          final SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+
+                          await prefs.setString('auth_token', token);
+                          await prefs.setString('user_id', userId);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => NavigationManagerScreen(),
+                            ),
+                          );
+                        } else {
+                          final error = jsonDecode(response.body)['message'];
+                          debugPrint('SignIn failed: $error');
+                        }
+                      }
+                    },
                     child: Text("Login"),
                   ),
                 ),

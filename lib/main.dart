@@ -14,18 +14,24 @@ import 'package:campy/screens/splash_screen.dart';
 import 'package:campy/style_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => AppState(),
-      child: const MyApp(),
+      child: MyApp(onBoard: hasSeenOnboarding),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool onBoard;
+  const MyApp({super.key, required this.onBoard});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +40,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       routes: {
-        "/": (context) => SplashScreen(),
+        "/": (context) => SplashScreen(onBoard: onBoard),
         "/Auth": (context) => AuthManager(),
         "/login": (context) => LoginScreen(),
         "/register": (context) => RegisterScreen(),

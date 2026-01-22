@@ -1,8 +1,10 @@
+import 'package:campy/screens/auth/register_screen.dart';
 import 'package:campy/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final bool onBoard;
+  const SplashScreen({super.key, required this.onBoard});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -12,8 +14,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    //TODO: show only when first time user
-    _navigateToOnboarding();
+    if (widget.onBoard) {
+      _navigateToAuthManager();
+    } else {
+      _navigateToOnboarding();
+    }
   }
 
   void _navigateToOnboarding() async {
@@ -24,6 +29,17 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+    );
+  }
+
+  void _navigateToAuthManager() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const RegisterScreen()),
     );
   }
 

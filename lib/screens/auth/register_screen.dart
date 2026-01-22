@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:campy/api/campy_backend_manager.dart';
+import 'package:campy/app_state.dart';
 import 'package:campy/screens/auth/login_screen.dart';
-import 'package:campy/screens/home_screen.dart';
 import 'package:campy/screens/navigation_manager_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -11,6 +16,10 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  bool? isTermsAgreed = false;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -59,6 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 20.0),
                   child: TextField(
+                    controller: nameController,
                     keyboardType: TextInputType.name,
                     decoration: InputDecoration(
                       filled: true,
@@ -76,6 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 20.0),
                   child: TextField(
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       filled: true,
@@ -93,6 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 8),
                   child: TextField(
+                    controller: passwordController,
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -111,7 +123,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 0),
                   child: Row(
                     children: [
-                      Checkbox.adaptive(value: false, onChanged: (value) {}),
+                      Checkbox.adaptive(
+                        value: isTermsAgreed,
+                        onChanged: (value) {
+                          setState(() {
+                            isTermsAgreed = value;
+                          });
+                        },
+                      ),
                       Text(
                         "By checking the box you agree to our Terms and Conditions.",
                         textScaler: TextScaler.linear(0.7),
@@ -134,14 +153,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       maximumSize: WidgetStatePropertyAll(Size(350, 45)),
                       fixedSize: WidgetStatePropertyAll(Size(350, 45)),
                     ),
-                    onPressed: () {
-                      //TODO: Check for the fields and navigate to home with the correct user
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NavigationManagerScreen(),
-                        ),
-                      );
+                    onPressed: () async {
+                      if (nameController.text.isEmpty ||
+                          emailController.text.isEmpty ||
+                          passwordController.text.isEmpty ||
+                          isTermsAgreed == false ||
+                          isTermsAgreed == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please fill in all fields'),
+                          ),
+                        );
+                        return;
+                      } else {
+                        //TODO: Get from the response the token and the userID
+                        User user = User(
+                          name: nameController.text.trim(),
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
+                          kudos: "0",
+                        );
+                        http.Response response = await signUp(user);
+                        if (response.statusCode == 201) {
+                          final Map<String, dynamic> decoded = jsonDecode(
+                            response.body,
+                          );
+
+                          final String token = decoded['data']['token'];
+                          final String userId = decoded['data']['userId'];
+                          AppState().token = token;
+                          AppState().userID = userId;
+
+                          debugPrint('TOKEN: $token');
+                          debugPrint('USER ID: $userId');
+                          final SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+
+                          await prefs.setString('auth_token', token);
+                          await prefs.setString('user_id', userId);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => NavigationManagerScreen(),
+                            ),
+                          );
+                        } else {
+                          final error = jsonDecode(response.body)['message'];
+                          debugPrint('Signup failed: $error');
+                        }
+                      }
                     },
                     child: Text("Register"),
                   ),

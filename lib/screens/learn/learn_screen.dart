@@ -1,4 +1,3 @@
-import 'package:campy/shared/widgets/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class LearnScreen extends StatefulWidget {

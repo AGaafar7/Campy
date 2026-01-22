@@ -1,7 +1,8 @@
-import 'package:campy/screens/auth/register_screen.dart';
+import 'package:campy/screens/auth/auth_manager.dart';
 import 'package:campy/screens/onboarding/dots_indicator.dart';
 import 'package:campy/screens/onboarding/onboarding_item.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -46,10 +47,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  void _finishOnboarding() {
+  void _finishOnboarding() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_onboarding', true);
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+      MaterialPageRoute(builder: (_) => const AuthManager()),
     );
   }
 
