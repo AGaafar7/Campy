@@ -1,3 +1,6 @@
+import 'package:campy/screens/auth/login_screen.dart';
+import 'package:campy/screens/home_screen.dart';
+import 'package:campy/screens/navigation_manager_screen.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -131,13 +134,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       maximumSize: WidgetStatePropertyAll(Size(350, 45)),
                       fixedSize: WidgetStatePropertyAll(Size(350, 45)),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      //TODO: Check for the fields and navigate to home with the correct user
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NavigationManagerScreen(),
+                        ),
+                      );
+                    },
                     child: Text("Register"),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 24),
-                  child: Text("Already a member? Log In"),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                    child: Text("Already a member? Log In"),
+                  ),
                 ),
               ],
             ),

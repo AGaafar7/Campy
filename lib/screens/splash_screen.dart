@@ -12,6 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    //TODO: show only when first time user
     _navigateToOnboarding();
   }
 

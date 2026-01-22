@@ -1,3 +1,4 @@
+import 'package:campy/screens/auth/register_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -119,7 +120,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 24),
-                  child: Text("New Member? Register now"),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterScreen(),
+                        ),
+                      );
+                    },
+                    child: Text("New Member? Register now"),
+                  ),
                 ),
               ],
             ),

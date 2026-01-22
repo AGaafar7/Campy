@@ -1,3 +1,4 @@
+import 'package:campy/screens/auth/register_screen.dart';
 import 'package:campy/screens/onboarding/dots_indicator.dart';
 import 'package:campy/screens/onboarding/onboarding_item.dart';
 import 'package:flutter/material.dart';
@@ -46,11 +47,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _finishOnboarding() {
-    // Navigate to Login / Home
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (_) => const LoginScreen()),
-    // );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+    );
   }
 
   @override
@@ -130,12 +130,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
+                                    color: Colors.white,
                                   ),
                                 ),
                               )
                             : FloatingActionButton(
                                 onPressed: _next,
                                 backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
                                 child: const Icon(
                                   Icons.arrow_forward,
                                   size: 22,

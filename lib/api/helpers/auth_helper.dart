@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 ///Sign Up a new user
 Future<http.Response> signUp(User user) {
   return http.post(
-    Uri.parse("$base_url/auth/sign-up"),
+    Uri.parse("$baseUrl/auth/sign-up"),
     body: {"name": user.name, "email": user.email, "password": user.password},
   );
 }
@@ -15,7 +15,7 @@ Future<http.Response> signUp(User user) {
 ///User sign in
 Future<http.Response> signIn(User user) {
   return http.post(
-    Uri.parse("$base_url/auth/sign-in"),
+    Uri.parse("$baseUrl/auth/sign-in"),
     body: {"email": user.email, "password": user.password},
   );
 }
@@ -23,7 +23,7 @@ Future<http.Response> signIn(User user) {
 ///Sign out
 Future<http.Response> signOut(String token) {
   return http.post(
-    Uri.parse("$base_url/auth/sign-in"),
+    Uri.parse("$baseUrl/auth/sign-in"),
     headers: {"Authorization": "Bearer $token"},
   );
 }

@@ -6,23 +6,23 @@ import 'package:http/http.dart' as http;
 // Lesson API Route Logic
 ///All Get Lessons
 Future<http.Response> getLessons() {
-  return http.get(Uri.parse("$base_url/lessons"));
+  return http.get(Uri.parse("$baseUrl/lessons"));
 }
 
 ///Get all lessons for course
 Future<http.Response> getLessonsByCourse(Course course) {
-  return http.get(Uri.parse("$base_url/lessons/course/:${course.id}"));
+  return http.get(Uri.parse("$baseUrl/lessons/course/:${course.id}"));
 }
 
 ///Get lesson
 Future<http.Response> getLessonByID(Lesson lesson) {
-  return http.get(Uri.parse("$base_url/lessons/:${lesson.id}"));
+  return http.get(Uri.parse("$baseUrl/lessons/:${lesson.id}"));
 }
 
 //Create Lesson
 Future<http.Response> createLesson(Lesson lesson, Course course, String token) {
   return http.post(
-    Uri.parse("$base_url/lessons/"),
+    Uri.parse("$baseUrl/lessons/"),
     headers: {"Authorization": "Bearer $token"},
     body: {
       "lessonId": lesson.id,
@@ -39,7 +39,7 @@ Future<http.Response> createLesson(Lesson lesson, Course course, String token) {
 //Update Lesson
 Future<http.Response> updateLesson(Lesson lesson, String token) {
   return http.put(
-    Uri.parse("$base_url/lessons/:${lesson.id}"),
+    Uri.parse("$baseUrl/lessons/:${lesson.id}"),
     headers: {"Authorization": "Bearer $token"},
     body: {"title": lesson.title, "duration": lesson.duration},
   );
@@ -48,7 +48,7 @@ Future<http.Response> updateLesson(Lesson lesson, String token) {
 //Delete Lesson
 Future<http.Response> deleteLesson(Lesson lesson, String token) {
   return http.delete(
-    Uri.parse("$base_url/lessons/:${lesson.id}"),
+    Uri.parse("$baseUrl/lessons/:${lesson.id}"),
     headers: {"Authorization": "Bearer $token"},
   );
 }

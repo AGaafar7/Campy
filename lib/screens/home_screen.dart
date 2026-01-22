@@ -1,4 +1,3 @@
-import 'package:campy/shared/widgets/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,307 +10,340 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
+      extendBody: true,
+      body: SingleChildScrollView(
+        child: SafeArea(
+          bottom: false,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: AssetImage("assets/profileicon.png"),
-                      radius: 25,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Let’s start Learning"),
-                          //TODO: Replace with user name comming from the backend
-                          Text("Hi, Gaafar!"),
-                          //TODO: Replace with kudos comming from the backend
-                          Text("430 Kudos"),
-                        ],
+              _buildHeader(),
+              _buildStreakCard(),
+              _buildKudosCard(),
+              _buildSectionTitle("Continue Learning"),
+              _buildContinueLearningList(),
+              _buildSectionTitle("Recent Achievement"),
+              _buildAchievementGrid(),
+              _buildSectionTitle("Badges & Certificates"),
+              _buildBadgesSection(),
+              const SizedBox(height: 120),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Modular UI Components ---
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 28,
+            backgroundImage: AssetImage("assets/profileicon.png"),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                "Hi, Gaafar!",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text("430 Kudos • Level 5", style: TextStyle(color: Colors.grey)),
+            ],
+          ),
+          const Spacer(),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.notifications_none_rounded),
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStreakCard() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade50,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.local_fire_department_rounded,
+            color: Colors.orange,
+            size: 40,
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                "12 Day Streak",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text(
+                "You're on fire! Keep it up.",
+                style: TextStyle(color: Colors.orange),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKudosCard() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Next Level Progress",
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 12),
+          LinearProgressIndicator(
+            value: 0.7,
+            minHeight: 8,
+            backgroundColor: Colors.grey.shade200,
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                "Level 5",
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              Text(
+                "150 Kudos to Level 6",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildContinueLearningList() {
+    return SizedBox(
+      height: 220,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.only(left: 20),
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          return Container(
+            width: 200,
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: Image.asset(
+                    "assets/continuelearningpic.png",
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Flutter UI Master",
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    Spacer(),
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.notifications_outlined),
+                      const Text(
+                        "65% Complete",
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 32,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {},
+                          child: const Text("Resume"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildAchievementGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: 0,
+          crossAxisSpacing: 10,
+          childAspectRatio: 0.85, // Adjust this to reduce vertical space
+        ),
+        itemCount: 4,
+        itemBuilder: (context, index) {
+          return Column(
+            mainAxisSize: MainAxisSize.min, // Take only needed space
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.yellow.shade100,
+                child: const Icon(Icons.stars, color: Colors.orange),
+              ),
+              const SizedBox(height: 4),
+              const Text("5 Days", style: TextStyle(fontSize: 10)),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBadgesSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // Example Badge 1
+              Expanded(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      "assets/badges.png",
+                      height: 60,
+                    ), // Use your existing asset
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Top Learner",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
               ),
-              //TODO: Extract to be a widget called streak to make the code more readible and shorter
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: BoxBorder.all(style: BorderStyle.solid),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 8,
+              // Example Badge 2
+              Expanded(
+                child: Column(
+                  children: [
+                    Opacity(
+                      opacity: 0.5, // Faded if not yet earned
+                      child: Icon(
+                        Icons.workspace_premium,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Current Streak"),
-                            Text("12 days"),
-                            Text("You're on fire! Keep it up."),
-                          ],
-                        ),
-                        Spacer(),
-                        Icon(Icons.fire_extinguisher_rounded),
-                      ],
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Certificate",
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
-                  ),
+                  ],
                 ),
               ),
-              //TODO: Extract like the above
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 94,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: BoxBorder.all(style: BorderStyle.solid),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Total Kudos"),
-                        Text("430"),
-                        const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: 0.2,
-                          minHeight: 12,
-                          color: Colors.black,
-                          valueColor: null,
-                          backgroundColor: Colors.grey[350],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        Row(
-                          children: [
-                            Text("Level 5"),
-                            Spacer(),
-                            Text("150 Kudos to Level 6"),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text("Continue Learning"),
-              ),
-              //TODO: Should be a list view with all the courses to continue learning also fix the image to look like your ui
-              //Continue learning section
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 170,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: BoxBorder.all(style: BorderStyle.solid),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset("assets/continuelearningpic.png"),
-                        Text("Introduction to Flutter"),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text("4h 30m"),
-                            const SizedBox(width: 8),
-                            Text("16/24 lessons"),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [Text("Progress"), Spacer(), Text("65%")],
-                        ),
-                        const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: 0.2,
-                          minHeight: 10,
-                          color: Colors.black,
-                          valueColor: null,
-                          backgroundColor: Colors.grey[350],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        const SizedBox(height: 4),
-                        Center(
-                          child: ElevatedButton(
-                            style: ButtonStyle(
-                              shape: WidgetStatePropertyAll(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadiusGeometry.circular(
-                                    16,
-                                  ),
-                                ),
-                              ),
-                              backgroundColor: WidgetStatePropertyAll(
-                                Colors.black,
-                              ),
-                              foregroundColor: WidgetStatePropertyAll(
-                                Colors.white,
-                              ),
-
-                              fixedSize: WidgetStatePropertyAll(Size(105, 25)),
-                            ),
-                            onPressed: () {},
-                            child: Text("Continue"),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 4),
-              //Recent Acheivment
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text("Recent Achievement"),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 8,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: BoxBorder.all(style: BorderStyle.solid),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              children: [
-                                Icon(Icons.star_border_outlined),
-                                Text("5 days streak"),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              //Badges and Certificates
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text("Badges & Certificates"),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: BoxBorder.all(style: BorderStyle.solid),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [Image.asset("assets/badges.png")],
-                  ),
+              // "View All" Button
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  "View All",
+                  style: TextStyle(color: Colors.blue),
                 ),
               ),
             ],
           ),
-        ),
-        bottomNavigationBar: CustomBottomBar(
-          currentIndex: 0,
-          onTap: (value) {},
-        ),
+        ],
       ),
     );
   }

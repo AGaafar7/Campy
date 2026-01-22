@@ -78,10 +78,6 @@ class LeaderboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
-        child: CustomBottomBar(currentIndex: 2, onTap: (value) {}),
-      ),
     );
   }
 

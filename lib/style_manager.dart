@@ -9,7 +9,10 @@ abstract class StyleManager {
   static const textHighLight = Colors.black;
 }
 
-abstract class _LightColors {}
+abstract class _LightColors {
+  static const backgroundColor = Color(0xFFFFFFFF);
+  static const scaffoldBackgroundColor = Color(0xFFFFFFFF);
+}
 
 abstract class _DarkColors {
   static const backgroundColor = Color(0xFF333333);
@@ -25,13 +28,12 @@ abstract class AppTheme {
     brightness: Brightness.light,
     appBarTheme: const AppBarTheme(
       elevation: 0,
-      //backgroundColor: _LightColors.backgroundColor,
+      backgroundColor: _LightColors.backgroundColor,
       titleTextStyle: TextStyle(color: StyleManager.textOnLight),
       iconTheme: IconThemeData(color: StyleManager.iconOnLight),
     ),
     visualDensity: visualDensity,
-    //backgroundColor: _LightColors.backgroundColor,
-    //scaffoldBackgroundColor: _LightColors.scaffoldBackgroundColor,
+    scaffoldBackgroundColor: _LightColors.scaffoldBackgroundColor,
     textTheme: const TextTheme().apply(bodyColor: StyleManager.textOnLight),
     iconTheme: const IconThemeData(color: StyleManager.iconOnLight),
   );
@@ -47,7 +49,7 @@ abstract class AppTheme {
     visualDensity: visualDensity,
     colorScheme: ColorScheme.fromSwatch().copyWith(
       brightness: Brightness.dark,
-      background: _DarkColors.backgroundColor,
+      surface: _DarkColors.backgroundColor,
     ),
     scaffoldBackgroundColor: _DarkColors.scaffoldBackgroundColor,
     textTheme: const TextTheme().apply(bodyColor: StyleManager.textOnDark),

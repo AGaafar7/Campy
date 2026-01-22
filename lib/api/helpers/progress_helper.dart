@@ -4,12 +4,12 @@ import 'package:http/http.dart' as http;
 // Progress API Route Logic
 ///Get Course Progress for specific user
 Future<http.Response> getCourseProgressForUser(String userID, String courseID) {
-  return http.get(Uri.parse("$base_url/progress/:$userID/:$courseID"));
+  return http.get(Uri.parse("$baseUrl/progress/:$userID/:$courseID"));
 }
 
 ///Get All Courses Progress for User
 Future<http.Response> getCoursesProgressForUser(String userID) {
-  return http.get(Uri.parse("$base_url/progress/user/:$userID"));
+  return http.get(Uri.parse("$baseUrl/progress/user/:$userID"));
 }
 
 ///Complete lesson
@@ -19,7 +19,7 @@ Future<http.Response> completeLesson(
   String lessonID,
 ) {
   return http.post(
-    Uri.parse("$base_url/progress/complete-lesson"),
+    Uri.parse("$baseUrl/progress/complete-lesson"),
     body: {"userId": userID, "courseId": courseID, "lessonId": lessonID},
   );
 }
@@ -27,12 +27,12 @@ Future<http.Response> completeLesson(
 ///Reset Course
 Future<http.Response> resetCourse(String userID, String courseID) {
   return http.post(
-    Uri.parse("$base_url/progress/reset"),
+    Uri.parse("$baseUrl/progress/reset"),
     body: {"userId": userID, "courseId": courseID},
   );
 }
 
 ///Get Course Statistics
 Future<http.Response> getCourseStatistics(String courseID) {
-  return http.get(Uri.parse("$base_url/progress/course/:$courseID/stats"));
+  return http.get(Uri.parse("$baseUrl/progress/course/:$courseID/stats"));
 }

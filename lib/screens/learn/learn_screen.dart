@@ -56,10 +56,6 @@ class _LearnScreenState extends State<LearnScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
-        child: CustomBottomBar(currentIndex: 3, onTap: (value) {}),
-      ),
     );
   }
 
