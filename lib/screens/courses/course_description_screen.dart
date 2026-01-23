@@ -216,14 +216,10 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
                       );
                     }
 
-                  
                     if (widget.isOwned) {
-                      
                       startLesson(0);
                     } else if (buttonText == "Enroll Now") {
-                     
                       try {
-                   
                         showDialog(
                           context: context,
                           barrierDismissible: false,
@@ -234,17 +230,23 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
                           ),
                         );
 
-                       
                         final response = await enrollUserInCourse(
                           AppState().token,
                           Course(
                             id: widget.course['_id'],
-                            title: widget.course['title'], description: '', duration: '', instructorID: '', price: '', category: '', level: '', thumbnail: '',
-                          ), 
+                            title: widget.course['title'],
+                            description: '',
+                            duration: '',
+                            instructorID: '',
+                            price: '',
+                            category: '',
+                            level: '',
+                            thumbnail: '',
+                          ),
                           AppState().userID,
                         );
-
-                        Navigator.pop(context); 
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
 
                         if (response.statusCode == 200 ||
                             response.statusCode == 201) {

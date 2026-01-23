@@ -241,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContinueLearningList() {
-    // 1. Check if the list is empty to avoid errors or blank spaces
+   
     if (continueLearningCourses.isEmpty) {
       return const Padding(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -298,13 +298,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        courseTitle, // Dynamic Title
+                        courseTitle,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "$progressPercent% Complete", // Dynamic Progress
+                        "$progressPercent% Complete",
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
@@ -339,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildAchievementGrid() {
+  /*Widget _buildAchievementGrid() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GridView.builder(
@@ -369,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
+*/
   Widget _buildBadgesSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),

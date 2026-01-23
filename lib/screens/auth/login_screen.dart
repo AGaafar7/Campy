@@ -168,6 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           await prefs.setString('auth_token', token);
                           await prefs.setString('user_id', userId);
+                          if (!context.mounted) return;
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

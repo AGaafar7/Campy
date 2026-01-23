@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'package:campy/api/campy_backend_manager.dart'; // Ensure getCourses & getCourseByUserID are here
+import 'package:campy/api/campy_backend_manager.dart';
 import 'package:campy/app_state.dart';
 import 'package:campy/screens/courses/course_description_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class CoursesExploreScreen extends StatefulWidget {
   const CoursesExploreScreen({super.key});
@@ -213,14 +212,12 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
           return GestureDetector(
             onTap: () {
               Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CourseDescriptionScreen(
-              course: course,
-              isOwned: isOwned,
-            ),
-          ),
-        );
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      CourseDescriptionScreen(course: course, isOwned: isOwned),
+                ),
+              );
             },
             child: CourseCard(course: course, isOwned: isOwned),
           );
