@@ -24,7 +24,7 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
   Set<String> completedCourseIds = {};
   List<dynamic> allCourses = [];
   List<dynamic> filteredCourses = [];
-  Set<String> enrolledCourseIds = {}; // Store IDs for quick lookup
+  Set<String> enrolledCourseIds = {}; 
   bool isLoading = true;
   String selectedCategory = "All";
   String searchQuery = "";
@@ -38,7 +38,6 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
   Future<void> loadData() async {
     setState(() => isLoading = true);
     try {
-      // 1. Fetch All Courses and User Enrolled Courses in parallel
       final results = await Future.wait([
         getCourses(),
         getCourseByUserID(AppState().userID),
@@ -52,7 +51,6 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
         final coursesData = jsonDecode(results[0].body)['data'] as List;
         final enrolledData = jsonDecode(results[1].body)['data'] as List;
 
-        // Parse progress data to find completed courses
         final progressResponse = results[2];
         Set<String> completedIds = {};
         if (progressResponse.statusCode == 200) {
@@ -69,7 +67,7 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
           enrolledCourseIds = enrolledData
               .map((item) => item['courseId']['_id'].toString())
               .toSet();
-          completedCourseIds = completedIds; // Store the completed IDs
+          completedCourseIds = completedIds; 
           isLoading = false;
         });
       }
@@ -264,7 +262,6 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dynamic price logic
     final double price = double.tryParse(course['price'].toString()) ?? 0.0;
     String statusText;
     Color statusColor;
@@ -301,7 +298,6 @@ class CourseCard extends StatelessWidget {
                 top: Radius.circular(15),
               ),
               child: Image.network(
-                // Use Network image for backend data
                 course['thumbnail'] ?? "",
                 width: double.infinity,
                 fit: BoxFit.cover,

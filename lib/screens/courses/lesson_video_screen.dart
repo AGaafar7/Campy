@@ -8,16 +8,15 @@ import 'package:flutter/material.dart';
 class VideoLessonScreen extends StatelessWidget {
   final List<dynamic> lessons;
   final int currentIndex;
-  final Set<String> completedLessonIds; // Added set tracker
+  final Set<String> completedLessonIds; 
 
   const VideoLessonScreen({
     super.key,
     required this.lessons,
     required this.currentIndex,
-    required this.completedLessonIds, // Require set in constructor
+    required this.completedLessonIds, 
   });
 
-  // Helper to safely get ID String
   String _safeId(dynamic data) {
     if (data == null) return "";
     if (data is String) return data;
@@ -45,7 +44,6 @@ class VideoLessonScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Video Placeholder
             Container(
               height: 250,
               color: Colors.black,
@@ -89,7 +87,6 @@ class VideoLessonScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
 
-                  // Conditional Row: Show Next Button or Finish Button
                   if (hasNext)
                     _buildNextButton(context)
                   else
@@ -110,7 +107,6 @@ class VideoLessonScreen extends StatelessWidget {
 
     return InkWell(
       onTap: () async {
-        // CHECK: Only call API if lesson is NOT already in the set
         if (!completedLessonIds.contains(currentLesson['_id'])) {
           try {
             await completeLesson(
@@ -119,7 +115,7 @@ class VideoLessonScreen extends StatelessWidget {
               _safeId(currentLesson['courseId']),
               _safeId(currentLesson),
             );
-            // Locally update the set to prevent double calls if they navigate back
+            
             completedLessonIds.add(currentLesson['_id']);
             await _awardKudos();
           } catch (e) {
@@ -181,7 +177,6 @@ class VideoLessonScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () async {
-          // Check before marking the last lesson complete
           if (!completedLessonIds.contains(currentLesson['_id'])) {
             await completeLesson(
               AppState().token,
@@ -209,7 +204,6 @@ class VideoLessonScreen extends StatelessWidget {
 
   Future<void> _awardKudos() async {
     try {
-      // 1. Fetch current user data to get the latest Name and Email
       final response = await getUsersByID(AppState().userID);
 
       if (response.statusCode == 200) {
@@ -217,19 +211,17 @@ class VideoLessonScreen extends StatelessWidget {
 
         String currentName = userData['name'];
         String currentEmail = userData['email'];
-        // Get existing kudos from DB and add 10
         int currentKudos = int.tryParse(userData['kudos'].toString()) ?? 0;
         int newKudos = currentKudos + 10;
 
-        // 2. Create the User object for the Update request
         User updatedUser = User(
           name: currentName,
           email: currentEmail,
-          password: "", // Password is not needed for the update route usually
+          password: "", 
           kudos: newKudos.toString(),
         );
 
-        // 3. Send the Update request
+      
         final updateResponse = await updateUser(
           updatedUser,
           AppState().userID,
@@ -237,7 +229,7 @@ class VideoLessonScreen extends StatelessWidget {
         );
 
         if (updateResponse.statusCode == 200) {
-          // 4. (Optional) Show feedback to the user
+       
           debugPrint("Awarded 10 Kudos! Total: $newKudos");
         }
       }

@@ -17,7 +17,6 @@ class ArticleLessonScreen extends StatelessWidget {
     required this.completedLessonIds,
   });
 
-  // Helper to safely get String ID
   String _safeId(dynamic data) {
     if (data == null) return "";
     if (data is String) return data;
@@ -90,7 +89,6 @@ class ArticleLessonScreen extends StatelessWidget {
                         if (hasNext) _buildNavCard(context, currentIndex + 1)
                         else TextButton(
                           onPressed: () async {
-                            // Only call API if not already completed
                             if (!completedLessonIds.contains(currentLesson['_id'])) {
                               await completeLesson(
                                 AppState().token,
@@ -120,8 +118,7 @@ class ArticleLessonScreen extends StatelessWidget {
     final currentLesson = lessons[currentIndex];
     
     if (markAsComplete) {
-      // CHECK: If lesson is already in the completed set, skip the API call
-      if (!completedLessonIds.contains(currentLesson['_id'])) {
+        if (!completedLessonIds.contains(currentLesson['_id'])) {
         try {
           await completeLesson(
             AppState().token,
@@ -129,8 +126,7 @@ class ArticleLessonScreen extends StatelessWidget {
             _safeId(currentLesson['courseId']),
             _safeId(currentLesson),
           );
-          // Add it to the set locally so if they go back and forth, it doesn't trigger again
-          completedLessonIds.add(currentLesson['_id']);
+         completedLessonIds.add(currentLesson['_id']);
         } catch (e) {
           debugPrint("Error: $e");
         }
@@ -171,7 +167,6 @@ class ArticleLessonScreen extends StatelessWidget {
 
   Future<void> _awardKudos() async {
   try {
-    // 1. Fetch current user data to get the latest Name and Email
     final response = await getUsersByID(AppState().userID);
     
     if (response.statusCode == 200) {
@@ -179,19 +174,16 @@ class ArticleLessonScreen extends StatelessWidget {
       
       String currentName = userData['name'];
       String currentEmail = userData['email'];
-      // Get existing kudos from DB and add 10
       int currentKudos = int.tryParse(userData['kudos'].toString()) ?? 0;
       int newKudos = currentKudos + 10;
 
-      // 2. Create the User object for the Update request
       User updatedUser = User(
         name: currentName,
         email: currentEmail,
-        password: "", // Password is not needed for the update route usually
+        password: "", 
         kudos: newKudos.toString(),
       );
 
-      // 3. Send the Update request
       final updateResponse = await updateUser(
         updatedUser,
         AppState().userID,
@@ -199,7 +191,6 @@ class ArticleLessonScreen extends StatelessWidget {
       );
 
       if (updateResponse.statusCode == 200) {
-        // 4. (Optional) Show feedback to the user
         debugPrint("Awarded 10 Kudos! Total: $newKudos");
       }
     }

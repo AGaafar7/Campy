@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:campy/api/campy_backend_manager.dart'; // Ensure getUsers() is defined here
+import 'package:campy/api/campy_backend_manager.dart';
 import 'package:campy/app_state.dart';
 import 'package:flutter/material.dart';
 
@@ -30,13 +30,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       if (response.statusCode == 200) {
         final List<dynamic> users = jsonDecode(response.body)['data'];
 
-        // 2. Sort users by kudos descending
+       
         users.sort((a, b) => (b['kudos'] ?? 0).compareTo(a['kudos'] ?? 0));
 
         setState(() {
-          // Top 3 for the Podium
+ 
           topUsers = users.take(3).toList();
-          // The rest for the List
+   
           otherUsers = users.skip(3).toList();
           isLoading = false;
         });
@@ -75,7 +75,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       final user = otherUsers[index];
                       final bool isMe = user['_id'] == AppState().userID;
                       return _buildLeaderboardRow(
-                        (index + 4).toString(), // Rank starts at 4
+                        (index + 4).toString(), 
                         isMe ? "You" : (user['name'] ?? "Anonymous"),
                         "${user['kudos'] ?? 0} kudos",
                         isMe,
@@ -89,7 +89,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   Widget _buildPodium() {
-    // Handling cases where there might be fewer than 3 users
     final user1 = topUsers.isNotEmpty ? topUsers[0] : null;
     final user2 = topUsers.length > 1 ? topUsers[1] : null;
     final user3 = topUsers.length > 2 ? topUsers[2] : null;
@@ -98,11 +97,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Rank 2 (Left)
+     
         if (user2 != null)
           _buildPodiumUser(user2['name'], "${user2['kudos']} kudos", "2", 70),
         const SizedBox(width: 15),
-        // Rank 1 (Center)
+   
         if (user1 != null)
           _buildPodiumUser(
             user1['name'],
@@ -112,7 +111,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             isWinner: true,
           ),
         const SizedBox(width: 15),
-        // Rank 3 (Right)
+       
         if (user3 != null)
           _buildPodiumUser(user3['name'], "${user3['kudos']} kudos", "3", 70),
       ],

@@ -30,7 +30,6 @@ class _LearnScreenState extends State<LearnScreen> {
     await _fetchOwnedCourses();
   }
 
-  // 1. Get User's Enrolled Courses (Endpoint: /courses/user/:userId)
   Future<void> _fetchOwnedCourses() async {
     setState(() => isLoading = true);
     try {
@@ -58,8 +57,6 @@ class _LearnScreenState extends State<LearnScreen> {
       setState(() => isLoading = false);
     }
   }
-
-  // 2. Load Lessons AND Progress simultaneously to avoid 429s
   Future<void> _loadCourseData(String courseId) async {
     setState(() => isLoading = true);
     try {
@@ -78,31 +75,30 @@ class _LearnScreenState extends State<LearnScreen> {
         final List lessonData = jsonDecode(lessonRes.body)['data'];
         final dynamic progressBody = jsonDecode(progressRes.body)['data'];
 
-        // 1. Target IDs from the course lessons
+   
         final List cleanedLessons = lessonData.map((lesson) {
           return {...lesson, '_id': lesson['_id'].toString().trim()};
         }).toList();
 
-        // 2. EXTRACT THE NESTED ID
+    
         final List progressList = progressBody['completedLessons'] ?? [];
         final Set<String> cleanedCompletedIds = progressList.map((item) {
           if (item is Map) {
-            // Your backend is 'populating' the lessonId.
-            // We need to check if lessonId is a Map itself.
+    
             var lessonRef = item['lessonId'];
 
             if (lessonRef is Map) {
-              // Extract _id from the populated lesson object
+        
               return lessonRef['_id'].toString().trim();
             } else {
-              // Fallback if it's just a String ID
+         
               return lessonRef.toString().trim();
             }
           }
           return item.toString().trim();
         }).toSet();
 
-        // THESE TWO LOGS SHOULD FINALLY MATCH EXACTLY
+ 
         debugPrint("CLEANED PROGRESS SET: $cleanedCompletedIds");
         debugPrint(
           "TARGET LESSON IDs: ${cleanedLessons.map((l) => l['_id']).toList()}",
@@ -175,10 +171,7 @@ class _LearnScreenState extends State<LearnScreen> {
     final String currentId = lesson['_id'];
     final bool isCompleted = completedLessonIds.contains(currentId);
 
-    // NEW LOGIC:
-    // 1. First lesson is always unlocked.
-    // 2. If this lesson is completed, it's unlocked (can re-watch).
-    // 3. If the PREVIOUS lesson is in the completed set, this one unlocks.
+
     bool isUnlocked = false;
     if (index == 0) {
       isUnlocked = true;
@@ -195,7 +188,7 @@ class _LearnScreenState extends State<LearnScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Stepper Icon Logic
+
           Column(
             children: [
               Container(
@@ -234,7 +227,7 @@ class _LearnScreenState extends State<LearnScreen> {
             ],
           ),
           const SizedBox(width: 15),
-          // Lesson Card
+
           Expanded(
             child: Opacity(
               opacity: isUnlocked ? 1.0 : 0.4,

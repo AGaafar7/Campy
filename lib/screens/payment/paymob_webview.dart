@@ -31,7 +31,7 @@ class _PaymobWebViewState extends State<PaymobWebView> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (url) {
-            // Check for success keywords in redirect URL
+          
             if (url.contains("success=true") ||
                 url.contains("txn_response_code=00")) {
               widget.onPaymentSuccess();

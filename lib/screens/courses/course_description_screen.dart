@@ -25,7 +25,7 @@ class CourseDescriptionScreen extends StatefulWidget {
 
 class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
   List<dynamic> lessons = [];
-  Set<String> completedLessonIds = {}; // Tracker for progress
+  Set<String> completedLessonIds = {};
   bool isLoadingLessons = true;
 
   @override
@@ -91,7 +91,6 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
     }
   }
 
-  // Common Navigation Logic
   void _startLesson(int index) {
     if (lessons.isEmpty) return;
 
@@ -115,7 +114,6 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
               ),
       ),
     ).then((_) {
-      // Refresh progress when user comes back from learning
       if (widget.isOwned) _fetchUserProgress();
     });
   }
@@ -157,7 +155,6 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
     );
   }
 
-  // --- Sub-Widgets ---
 
   Widget _buildCustomAppBar(dynamic course) {
     return Padding(
@@ -262,7 +259,6 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
             } else if (buttonText == "Enroll Now") {
               _handleEnrollment();
             } else {
-              //Here should be the payment flow
               final double price =
                   double.tryParse(widget.course['price'].toString()) ?? 0.0;
               _initiatePaymobTransaction(price);
@@ -394,7 +390,6 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
 
   Future<void> _initiatePaymobTransaction(double price) async {
     try {
-      // 1. Show Loading Dialog
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -402,7 +397,6 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
             const Center(child: CircularProgressIndicator(color: Colors.black)),
       );
 
-      // STEP 1: Authentication (Get Auth Token)
       final authResponse = await http.post(
         Uri.parse("https://accept.paymob.com/api/auth/tokens"),
         headers: {"Content-Type": "application/json"},
@@ -410,21 +404,20 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
       );
       final String authToken = jsonDecode(authResponse.body)['token'];
 
-      // STEP 2: Create Order (Get Order ID)
+   
       final orderResponse = await http.post(
         Uri.parse("https://accept.paymob.com/api/ecommerce/orders"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "auth_token": authToken,
           "delivery_needed": "false",
-          "amount_cents": (price * 100).toInt().toString(), // price in piasters
+          "amount_cents": (price * 100).toInt().toString(),
           "currency": "EGP",
           "items": [],
         }),
       );
       final String orderId = jsonDecode(orderResponse.body)['id'].toString();
 
-      // STEP 3: Generate Payment Key (Get Final Token)
       final keyResponse = await http.post(
         Uri.parse("https://accept.paymob.com/api/acceptance/payment_keys"),
         headers: {"Content-Type": "application/json"},
@@ -454,11 +447,9 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
       );
       final String finalPaymentToken = jsonDecode(keyResponse.body)['token'];
 
-      // Close Loading Dialog
       if (!mounted) return;
       Navigator.pop(context);
 
-      // STEP 4: Navigate to WebView Iframe
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -466,7 +457,6 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
             paymentToken: finalPaymentToken,
             iframeId: paymobIframeId,
             onPaymentSuccess: () {
-              // Trigger enrollment upon success
               _handleEnrollment();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -478,7 +468,7 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
         ),
       );
     } catch (e) {
-      if (mounted) Navigator.pop(context); // Close loading on error
+      if (mounted) Navigator.pop(context); 
       debugPrint("Paymob Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Payment Initialization Failed.")),

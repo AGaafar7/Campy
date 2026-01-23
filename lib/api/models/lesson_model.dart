@@ -14,11 +14,3 @@ class Lesson {
     required this.order,
   });
 }
-/*
-lesson.id
-lesson.title
-lesson.content
-lesson.duration
-lesson.videoURL
-lesson.order
-*/

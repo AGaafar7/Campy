@@ -19,15 +19,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Inside your AppState class
   Future<void> loadFromPrefs() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Get the values
+
     String? savedToken = prefs.getString('auth_token');
     String? savedId = prefs.getString('user_id');
 
-    // If they exist, put them back into our memory singleton
     if (savedToken != null && savedId != null) {
       token = savedToken;
       userID = savedId;

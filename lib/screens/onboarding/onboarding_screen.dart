@@ -82,10 +82,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Image
+                
                     Image.asset(item.image, height: 260, fit: BoxFit.contain),
 
-                    // Text
+             
                     Column(
                       children: [
                         Text(
@@ -108,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ],
                     ),
 
-                    // Bottom controls
+             
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

@@ -166,7 +166,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         );
                         return;
                       } else {
-                        //TODO: Get from the response the token and the userID
                         User user = User(
                           name: nameController.text.trim(),
                           email: emailController.text.trim(),

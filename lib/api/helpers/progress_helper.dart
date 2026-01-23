@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 
 // Progress API Route Logic
 ///Get Course Progress for specific user
-///Those require bearer token
 Future<http.Response> getCourseProgressForUser(String token,String userID, String courseID) {
   return http.get(Uri.parse("$baseUrl/progress/$userID/$courseID"), headers: {
     "Authorization": "Bearer $token"

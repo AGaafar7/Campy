@@ -3,7 +3,6 @@ import 'package:campy/config.dart';
 import 'package:http/http.dart' as http;
 
 //API Authentication Logic
-//Think about param and app state logic
 ///Sign Up a new user
 Future<http.Response> signUp(User user) {
   return http.post(

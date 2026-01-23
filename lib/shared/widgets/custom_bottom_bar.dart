@@ -13,12 +13,12 @@ class CustomBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 110, // Total height to accommodate the bird and the bar
+      height: 110,
       color: Colors.transparent,
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          // 1. The Main Floating Bar (The Pill)
+
           Positioned(
             bottom: 20,
             left: 20,
@@ -42,7 +42,7 @@ class CustomBottomBar extends StatelessWidget {
                   _buildNavItem(Icons.home_outlined, Icons.home, 0),
                   _buildNavItem(Icons.book_outlined, Icons.book, 1),
 
-                  // Empty space for the Bird Icon
+              
                   const SizedBox(width: 50),
 
                   _buildNavItem(Icons.bar_chart_outlined, Icons.bar_chart, 2),
@@ -52,7 +52,7 @@ class CustomBottomBar extends StatelessWidget {
             ),
           ),
 
-          // 2. The Floating Bird Icon
+      
           Positioned(
             bottom: 40,
             child: GestureDetector(
