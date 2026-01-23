@@ -17,6 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+  AppState().loadFromPrefs();
 
   runApp(
     ChangeNotifierProvider(

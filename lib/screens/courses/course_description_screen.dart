@@ -22,12 +22,42 @@ class CourseDescriptionScreen extends StatefulWidget {
 
 class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
   List<dynamic> lessons = [];
+  Set<String> completedLessonIds = {}; // Tracker for progress
   bool isLoadingLessons = true;
 
   @override
   void initState() {
     super.initState();
-    fetchLessons();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await fetchLessons();
+    if (widget.isOwned) {
+      await _fetchUserProgress();
+    }
+  }
+
+  Future<void> _fetchUserProgress() async {
+    try {
+      final response = await getCourseProgressForUser(
+        AppState().token,
+        AppState().userID,
+        widget.course['_id'],
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body)['data'];
+        final completed = data['completedLessons'] as List;
+        setState(() {
+          completedLessonIds = completed
+              .map((e) => e['lessonId'].toString())
+              .toSet();
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching progress: $e");
+    }
   }
 
   Future<void> fetchLessons() async {
@@ -58,6 +88,35 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
     }
   }
 
+  // Common Navigation Logic
+  void _startLesson(int index) {
+    if (lessons.isEmpty) return;
+
+    final lesson = lessons[index];
+    final bool isVideo =
+        lesson['videoUrl'] != null && lesson['videoUrl'].isNotEmpty;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => isVideo
+            ? VideoLessonScreen(
+                lessons: lessons,
+                currentIndex: index,
+                completedLessonIds: completedLessonIds,
+              )
+            : ArticleLessonScreen(
+                lessons: lessons,
+                currentIndex: index,
+                completedLessonIds: completedLessonIds,
+              ),
+      ),
+    ).then((_) {
+      // Refresh progress when user comes back from learning
+      if (widget.isOwned) _fetchUserProgress();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final course = widget.course;
@@ -75,218 +134,194 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  ),
-                  Text(
-                    course['category'] ?? "Course",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
+            _buildCustomAppBar(course),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.network(
-                      course['thumbnail'] ?? "",
-                      width: double.infinity,
-                      height: 250,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Image.asset(
-                        "assets/coursedescriptionpic.png",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    _buildCourseThumbnail(course),
                     const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            course['title'] ?? "Untitled Course",
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Instructor: ${course['instructor']['name'] ?? 'Expert'}",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            course['description'] ??
-                                "No description available.",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                              height: 1.5,
-                            ),
-                          ),
-                          const SizedBox(height: 25),
-                          Text(
-                            "${lessons.length} Lessons",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          isLoadingLessons
-                              ? const Center(child: CircularProgressIndicator())
-                              : ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: lessons.length,
-                                  itemBuilder: (context, index) {
-                                    final lesson = lessons[index];
-                                    return _buildLessonItem(
-                                      (index + 1).toString(),
-                                      lesson['title'],
-                                      // Logic: if videoUrl is empty, show "Article"
-                                      (lesson['videoUrl'] == null ||
-                                              lesson['videoUrl'].isEmpty)
-                                          ? "Article"
-                                          : "${lesson['duration']} min",
-                                    );
-                                  },
-                                ),
-                        ],
-                      ),
-                    ),
+                    _buildCourseDetails(course),
                   ],
                 ),
               ),
             ),
-
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (lessons.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("No lessons available yet."),
-                        ),
-                      );
-                      return;
-                    }
-
-                    // 1. NAVIGATION LOGIC
-                    void startLesson(int index) {
-                      final lesson = lessons[index];
-                      final bool isVideo =
-                          lesson['videoUrl'] != null &&
-                          lesson['videoUrl'].isNotEmpty;
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => isVideo
-                              ? VideoLessonScreen(
-                                  lessons: lessons,
-                                  currentIndex: index,
-                                )
-                              : ArticleLessonScreen(
-                                  lessons: lessons,
-                                  currentIndex: index,
-                                ),
-                        ),
-                      );
-                    }
-
-                    if (widget.isOwned) {
-                      startLesson(0);
-                    } else if (buttonText == "Enroll Now") {
-                      try {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) => const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          ),
-                        );
-
-                        final response = await enrollUserInCourse(
-                          AppState().token,
-                          Course(
-                            id: widget.course['_id'],
-                            title: widget.course['title'],
-                            description: '',
-                            duration: '',
-                            instructorID: '',
-                            price: '',
-                            category: '',
-                            level: '',
-                            thumbnail: '',
-                          ),
-                          AppState().userID,
-                        );
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-
-                        if (response.statusCode == 200 ||
-                            response.statusCode == 201) {
-                          startLesson(0);
-                        } else {
-                          debugPrint("Enrollment failed: ${response.body}");
-                        }
-                      } catch (e) {
-                        Navigator.pop(context);
-                        debugPrint("Error during enrollment: $e");
-                      }
-                    } else {
-                      // It's a paid course and not owned (Payment logic skipped as requested)
-                      debugPrint("Proceed to payment...");
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    buttonText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildBottomActionButton(buttonText),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLessonItem(String number, String title, String info) {
+  // --- Sub-Widgets ---
+
+  Widget _buildCustomAppBar(dynamic course) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          ),
+          Text(
+            course['category'] ?? "Course",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCourseThumbnail(dynamic course) {
+    return Image.network(
+      course['thumbnail'] ?? "",
+      width: double.infinity,
+      height: 250,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) =>
+          Image.asset("assets/coursedescriptionpic.png", fit: BoxFit.cover),
+    );
+  }
+
+  Widget _buildCourseDetails(dynamic course) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            course['title'] ?? "Untitled Course",
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Instructor: ${course['instructor']['name'] ?? 'Expert'}",
+            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            course['description'] ?? "No description available.",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 25),
+          Text(
+            "${lessons.length} Lessons",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          isLoadingLessons
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: lessons.length,
+                  itemBuilder: (context, index) {
+                    final lesson = lessons[index];
+                    bool isDone = completedLessonIds.contains(lesson['_id']);
+                    return _buildLessonItem(
+                      (index + 1).toString(),
+                      lesson['title'],
+                      (lesson['videoUrl'] == null || lesson['videoUrl'].isEmpty)
+                          ? "Article"
+                          : "${lesson['duration']} min",
+                      isDone,
+                    );
+                  },
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActionButton(String buttonText) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: SizedBox(
+        width: double.infinity,
+        height: 55,
+        child: ElevatedButton(
+          onPressed: () async {
+            if (lessons.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("No lessons available yet.")),
+              );
+              return;
+            }
+
+            if (widget.isOwned) {
+              _startLesson(0);
+            } else if (buttonText == "Enroll Now") {
+              _handleEnrollment();
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            buttonText,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleEnrollment() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) =>
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+
+      final response = await enrollUserInCourse(
+        AppState().token,
+        Course(
+          id: widget.course['_id'],
+          title: widget.course['title'],
+          description: '',
+          duration: '',
+          instructorID: '',
+          price: '',
+          category: '',
+          level: '',
+          thumbnail: '',
+        ),
+        AppState().userID,
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _startLesson(0);
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context);
+      debugPrint("Error during enrollment: $e");
+    }
+  }
+
+  Widget _buildLessonItem(
+    String number,
+    String title,
+    String info,
+    bool isDone,
+  ) {
     return IntrinsicHeight(
       child: Row(
         children: [
@@ -296,17 +331,19 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
                 width: 35,
                 height: 35,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: isDone ? Colors.green.shade100 : Colors.grey[200],
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  number,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
+                child: isDone
+                    ? const Icon(Icons.check, size: 18, color: Colors.green)
+                    : Text(
+                        number,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
               ),
               Expanded(child: Container(width: 1, color: Colors.grey[300])),
             ],

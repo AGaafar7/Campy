@@ -4,8 +4,10 @@ import 'package:http/http.dart' as http;
 // Progress API Route Logic
 ///Get Course Progress for specific user
 ///Those require bearer token
-Future<http.Response> getCourseProgressForUser(String userID, String courseID) {
-  return http.get(Uri.parse("$baseUrl/progress/$userID/$courseID"));
+Future<http.Response> getCourseProgressForUser(String token,String userID, String courseID) {
+  return http.get(Uri.parse("$baseUrl/progress/$userID/$courseID"), headers: {
+    "Authorization": "Bearer $token"
+  });
 }
 
 ///Get All Courses Progress for User
@@ -15,12 +17,16 @@ Future<http.Response> getCoursesProgressForUser(String userID) {
 
 ///Complete lesson
 Future<http.Response> completeLesson(
+  String token,
   String userID,
   String courseID,
   String lessonID,
 ) {
   return http.post(
     Uri.parse("$baseUrl/progress/complete-lesson"),
+    headers: {
+    "Authorization": "Bearer $token"
+  },
     body: {"userId": userID, "courseId": courseID, "lessonId": lessonID},
   );
 }

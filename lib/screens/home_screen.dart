@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:campy/api/campy_backend_manager.dart';
 import 'package:campy/app_state.dart';
 import 'package:campy/config.dart';
+import 'package:campy/screens/courses/lesson_article_screen.dart';
+import 'package:campy/screens/courses/lesson_video_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -28,14 +30,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void fetchUserProgress() async {
     final String userId = AppState().userID;
     final String token = AppState().token;
-    // Endpoint: GET /progress/user/:userId
+
     final response = await http.get(
       Uri.parse("$baseUrl/progress/user/$userId"),
-      // 2. Add the headers map here
+
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer $token', // 3. Pass the Bearer token
+        'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {
@@ -43,12 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
       final List<dynamic> allProgress = decoded['data'];
 
       setState(() {
-        // Filter for Continue Learning (Not completed)
         continueLearningCourses = allProgress
             .where((p) => p['isCompleted'] == false)
             .toList();
 
-        // Filter for Certificates (Completed)
         completedCertificates = allProgress
             .where((p) => p['isCompleted'] == true)
             .toList();
@@ -93,9 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildContinueLearningList(),
               //_buildSectionTitle("Recent Achievement"),
               //_buildAchievementGrid(),
-              //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTcyNjE4NThiZjJhNmIyYTJiODRiNzIiLCJpYXQiOjE3NjkxMzAxMDAsImV4cCI6MTc2OTczNDkwMH0.05XbGG-6s-D7tf-DYR9fAp_Fga84e7BMeA2Ud3Tws9A
-              //Free Course
-              //CAMP-FREE : 6972c9c9e77da463e4be44f3
+
               //paid course
               //Flat PRO: 6972ca04e77da463e4be44f6
               _buildSectionTitle("Badges & Certificates"),
@@ -241,7 +239,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContinueLearningList() {
-   
     if (continueLearningCourses.isEmpty) {
       return const Padding(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -254,13 +251,11 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.only(left: 20),
-        // 2. Use the actual length of your data list
+
         itemCount: continueLearningCourses.length,
         itemBuilder: (context, index) {
-          // 3. Extract the specific course progress object
           final progressData = continueLearningCourses[index];
 
-          // Following your API doc structure: data -> courseId -> title
           final String courseTitle =
               progressData['courseId']['title'] ?? "Unknown Course";
           final int progressPercent = progressData['overallProgress'] ?? 0;
@@ -322,8 +317,85 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          onPressed: () {
-                            // TODO: Navigate to Course Player using progressData['courseId']['_id']
+                          onPressed: () async {
+                            final String courseId =
+                                progressData['courseId']['_id'];
+                            final List<dynamic> completedLessons =
+                                progressData['completedLessons'] ?? [];
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+
+                            try {
+                              Course tempCourse = Course(
+                                id: courseId,
+                                title: progressData['courseId']['title'] ?? "",
+                                description: '',
+                                duration: '',
+                                instructorID: '',
+                                price: '',
+                                category: '',
+                                level: '',
+                                thumbnail: '',
+                              );
+
+                              final response = await getLessonsByCourse(
+                                tempCourse,
+                              );
+                              if (!context.mounted) return;
+                              Navigator.pop(context);
+
+                              if (response.statusCode == 200) {
+                                final List<dynamic> allLessons = jsonDecode(
+                                  response.body,
+                                )['data'];
+
+                                int resumeIndex = 0;
+                                Set<String> completedIds = completedLessons
+                                    .map((e) => e['lessonId'].toString())
+                                    .toSet();
+
+                                for (int i = 0; i < allLessons.length; i++) {
+                                  if (!completedIds.contains(
+                                    allLessons[i]['_id'],
+                                  )) {
+                                    resumeIndex = i;
+                                    break;
+                                  }
+                                }
+
+                                final lesson = allLessons[resumeIndex];
+                                final bool isVideo =
+                                    lesson['videoUrl'] != null &&
+                                    lesson['videoUrl'].isNotEmpty;
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => isVideo
+                                        ? VideoLessonScreen(
+                                            lessons: allLessons,
+                                            currentIndex: resumeIndex,
+                                            completedLessonIds: completedIds,
+                                          )
+                                        : ArticleLessonScreen(
+                                            lessons: allLessons,
+                                            currentIndex: resumeIndex,
+                                            completedLessonIds: completedIds,
+                                          ),
+                                  ),
+                                ).then((_) => fetchUserProgress());
+                              }
+                            } catch (e) {
+                              if (context.mounted) Navigator.pop(context);
+                              debugPrint("Error resuming course: $e");
+                            }
                           },
                           child: const Text("Resume"),
                         ),
@@ -438,11 +510,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.workspace_premium, // The Certificate Icon
-            size: 40,
-            color: Colors.amber,
-          ),
+          const Icon(Icons.workspace_premium, size: 40, color: Colors.amber),
           const SizedBox(height: 4),
           Text(
             courseName,
