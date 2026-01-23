@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'package:campy/app_state.dart';
+import 'package:campy/config.dart';
 import 'package:campy/screens/courses/lesson_article_screen.dart';
 import 'package:campy/screens/courses/lesson_video_screen.dart';
+import 'package:campy/screens/payment/paymob_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:campy/api/campy_backend_manager.dart';
+import 'package:http/http.dart' as http;
+import 'package:webview_flutter/webview_flutter.dart';
 
 class CourseDescriptionScreen extends StatefulWidget {
   final dynamic course;
@@ -258,6 +262,11 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
               _startLesson(0);
             } else if (buttonText == "Enroll Now") {
               _handleEnrollment();
+            } else {
+              //Here should be the payment flow
+              final double price =
+                  double.tryParse(widget.course['price'].toString()) ?? 0.0;
+              _initiatePaymobTransaction(price);
             }
           },
           style: ElevatedButton.styleFrom(
@@ -382,5 +391,99 @@ class _CourseDescriptionScreenState extends State<CourseDescriptionScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _initiatePaymobTransaction(double price) async {
+    try {
+      // 1. Show Loading Dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) =>
+            const Center(child: CircularProgressIndicator(color: Colors.black)),
+      );
+
+      // STEP 1: Authentication (Get Auth Token)
+      final authResponse = await http.post(
+        Uri.parse("https://accept.paymob.com/api/auth/tokens"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"api_key": paymobApiKey}),
+      );
+      final String authToken = jsonDecode(authResponse.body)['token'];
+
+      // STEP 2: Create Order (Get Order ID)
+      final orderResponse = await http.post(
+        Uri.parse("https://accept.paymob.com/api/ecommerce/orders"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "auth_token": authToken,
+          "delivery_needed": "false",
+          "amount_cents": (price * 100).toInt().toString(), // price in piasters
+          "currency": "EGP",
+          "items": [],
+        }),
+      );
+      final String orderId = jsonDecode(orderResponse.body)['id'].toString();
+
+      // STEP 3: Generate Payment Key (Get Final Token)
+      final keyResponse = await http.post(
+        Uri.parse("https://accept.paymob.com/api/acceptance/payment_keys"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "auth_token": authToken,
+          "amount_cents": (price * 100).toInt().toString(),
+          "expiration": 3600,
+          "order_id": orderId,
+          "billing_data": {
+            "apartment": "NA",
+            "email": AppState().userID,
+            "floor": "NA",
+            "first_name": AppState().userID,
+            "street": "NA",
+            "building": "NA",
+            "phone_number": "01000000000",
+            "shipping_method": "NA",
+            "postal_code": "NA",
+            "city": "NA",
+            "country": "NA",
+            "last_name": "User",
+            "state": "NA",
+          },
+          "currency": "EGP",
+          "integration_id": paymobIntegrationId,
+        }),
+      );
+      final String finalPaymentToken = jsonDecode(keyResponse.body)['token'];
+
+      // Close Loading Dialog
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      // STEP 4: Navigate to WebView Iframe
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymobWebView(
+            paymentToken: finalPaymentToken,
+            iframeId: paymobIframeId,
+            onPaymentSuccess: () {
+              // Trigger enrollment upon success
+              _handleEnrollment();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Payment Successful! Welcome to the course."),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) Navigator.pop(context); // Close loading on error
+      debugPrint("Paymob Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Payment Initialization Failed.")),
+      );
+    }
   }
 }

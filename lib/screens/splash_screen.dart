@@ -1,6 +1,7 @@
 import 'package:campy/app_state.dart';
 import 'package:campy/screens/auth/register_screen.dart';
 import 'package:campy/screens/home_screen.dart';
+import 'package:campy/screens/navigation_manager_screen.dart';
 import 'package:campy/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState()  {
+  void initState() {
     super.initState();
     if (widget.onBoard) {
       _navigateToAuthManager();
@@ -22,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
       _navigateToOnboarding();
     }
     if (AppState().userID != "" && AppState().token != "") {
-      _navigateToHomeScreen();
+      _navigateToNavigationManagerScreen();
     }
   }
 
@@ -37,14 +38,14 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  void _navigateToHomeScreen() async {
+  void _navigateToNavigationManagerScreen() async {
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const NavigationManagerScreen()),
     );
   }
 

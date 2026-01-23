@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:campy/api/campy_backend_manager.dart';
 import 'package:campy/app_state.dart';
+import 'package:campy/config.dart';
 import 'package:campy/screens/courses/course_description_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class CoursesExploreScreen extends StatefulWidget {
   const CoursesExploreScreen({super.key});
@@ -19,7 +21,7 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
     "AI",
     "Design",
   ];
-
+  Set<String> completedCourseIds = {};
   List<dynamic> allCourses = [];
   List<dynamic> filteredCourses = [];
   Set<String> enrolledCourseIds = {}; // Store IDs for quick lookup
@@ -40,19 +42,34 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
       final results = await Future.wait([
         getCourses(),
         getCourseByUserID(AppState().userID),
+        http.get(
+          Uri.parse("$baseUrl/progress/user/${AppState().userID}"),
+          headers: {'Authorization': 'Bearer ${AppState().token}'},
+        ),
       ]);
 
       if (results[0].statusCode == 200 && results[1].statusCode == 200) {
         final coursesData = jsonDecode(results[0].body)['data'] as List;
         final enrolledData = jsonDecode(results[1].body)['data'] as List;
 
+        // Parse progress data to find completed courses
+        final progressResponse = results[2] as http.Response;
+        Set<String> completedIds = {};
+        if (progressResponse.statusCode == 200) {
+          final List progressData = jsonDecode(progressResponse.body)['data'];
+          completedIds = progressData
+              .where((p) => p['isCompleted'] == true)
+              .map((p) => p['courseId']['_id'].toString())
+              .toSet();
+        }
+
         setState(() {
           allCourses = coursesData;
           filteredCourses = coursesData;
-          // Extract just the IDs of courses the user owns
           enrolledCourseIds = enrolledData
               .map((item) => item['courseId']['_id'].toString())
               .toSet();
+          completedCourseIds = completedIds; // Store the completed IDs
           isLoading = false;
         });
       }
@@ -208,7 +225,9 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
         ),
         delegate: SliverChildBuilderDelegate((context, index) {
           final course = filteredCourses[index];
-          final bool isOwned = enrolledCourseIds.contains(course['_id']);
+          final String courseId = course['_id'].toString();
+          final bool isOwned = enrolledCourseIds.contains(courseId);
+          final bool isCompleted = completedCourseIds.contains(courseId);
           return GestureDetector(
             onTap: () {
               Navigator.push(
@@ -219,7 +238,11 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
                 ),
               );
             },
-            child: CourseCard(course: course, isOwned: isOwned),
+            child: CourseCard(
+              course: course,
+              isOwned: isOwned,
+              isCompleted: isCompleted,
+            ),
           );
         }, childCount: filteredCourses.length),
       ),
@@ -230,14 +253,32 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
 class CourseCard extends StatelessWidget {
   final dynamic course;
   final bool isOwned;
+  final bool isCompleted;
 
-  const CourseCard({super.key, required this.course, required this.isOwned});
+  const CourseCard({
+    super.key,
+    required this.course,
+    required this.isOwned,
+    required this.isCompleted,
+  });
 
   @override
   Widget build(BuildContext context) {
     // Dynamic price logic
     final double price = double.tryParse(course['price'].toString()) ?? 0.0;
-    final String priceText = price == 0 ? "Free" : "\$$price";
+    String statusText;
+    Color statusColor;
+
+    if (isCompleted) {
+      statusText = "Completed";
+      statusColor = Colors.green;
+    } else if (isOwned) {
+      statusText = "Continue Learning";
+      statusColor = Colors.blue;
+    } else {
+      statusText = price == 0 ? "Free" : "\$$price";
+      statusColor = price == 0 ? Colors.green : Colors.black;
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -293,12 +334,12 @@ class CourseCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
+                if (isCompleted)
+                  if (isCompleted) const SizedBox(width: 4),
                 Text(
-                  isOwned ? "Continue Course" : priceText,
+                  statusText,
                   style: TextStyle(
-                    color: isOwned
-                        ? Colors.blue
-                        : (price == 0 ? Colors.green : Colors.black),
+                    color: statusColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

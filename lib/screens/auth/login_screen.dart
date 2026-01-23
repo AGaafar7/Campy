@@ -18,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  bool? isRememberMe = false;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -102,21 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 0),
-                  child: Row(
-                    children: [
-                      Checkbox.adaptive(
-                        value: isRememberMe,
-                        onChanged: (value) {
-                          setState(() {
-                            isRememberMe = value;
-                          });
-                        },
-                      ),
-                      Text("Remember me", textScaler: TextScaler.linear(0.7)),
-                      Spacer(),
-                      Text("Forgot Password ?"),
-                    ],
-                  ),
+                  child: Row(children: [Spacer(), Text("Forgot Password ?")]),
                 ),
                 const SizedBox(height: 20),
                 Padding(
@@ -135,16 +121,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     onPressed: () async {
                       if (emailController.text.isEmpty ||
-                          passwordController.text.isEmpty ||
-                          isRememberMe == false ||
-                          isRememberMe == null) {
+                          passwordController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Please fill in all fields'),
                           ),
                         );
                       } else {
-                        //TODO: think about how will the name be exported through out the app instead of always calling the backend then navigate to home with the correct user
                         User user = User(
                           name: "",
                           email: emailController.text.trim(),

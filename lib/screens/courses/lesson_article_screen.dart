@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:campy/api/campy_backend_manager.dart';
 import 'package:campy/app_state.dart';
 import 'package:campy/screens/courses/lesson_video_screen.dart';
@@ -96,6 +98,7 @@ class ArticleLessonScreen extends StatelessWidget {
                                 _safeId(currentLesson['courseId']),
                                 _safeId(currentLesson),
                               );
+                              await _awardKudos();
                             }
                             if (context.mounted) Navigator.pop(context);
                           },
@@ -165,4 +168,43 @@ class ArticleLessonScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _awardKudos() async {
+  try {
+    // 1. Fetch current user data to get the latest Name and Email
+    final response = await getUsersByID(AppState().userID);
+    
+    if (response.statusCode == 200) {
+      final userData = jsonDecode(response.body)['data'];
+      
+      String currentName = userData['name'];
+      String currentEmail = userData['email'];
+      // Get existing kudos from DB and add 10
+      int currentKudos = int.tryParse(userData['kudos'].toString()) ?? 0;
+      int newKudos = currentKudos + 10;
+
+      // 2. Create the User object for the Update request
+      User updatedUser = User(
+        name: currentName,
+        email: currentEmail,
+        password: "", // Password is not needed for the update route usually
+        kudos: newKudos.toString(),
+      );
+
+      // 3. Send the Update request
+      final updateResponse = await updateUser(
+        updatedUser,
+        AppState().userID,
+        AppState().token,
+      );
+
+      if (updateResponse.statusCode == 200) {
+        // 4. (Optional) Show feedback to the user
+        debugPrint("Awarded 10 Kudos! Total: $newKudos");
+      }
+    }
+  } catch (e) {
+    debugPrint("Error awarding kudos: $e");
+  }
+}
 }

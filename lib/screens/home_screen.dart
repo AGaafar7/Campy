@@ -5,6 +5,7 @@ import 'package:campy/app_state.dart';
 import 'package:campy/config.dart';
 import 'package:campy/screens/courses/lesson_article_screen.dart';
 import 'package:campy/screens/courses/lesson_video_screen.dart';
+import 'package:campy/streak_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,11 +21,20 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> completedCertificates = [];
   String name = "";
   String kudos = "";
+  int userStreak = 0;
   @override
   void initState() {
     super.initState();
     setupScreen();
     fetchUserProgress();
+    _loadStreak();
+  }
+
+  void _loadStreak() async {
+    int streak = await StreakManager().updateAndGetStreak();
+    setState(() {
+      userStreak = streak;
+    });
   }
 
   void fetchUserProgress() async {
@@ -167,9 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                "12 Day Streak",
+                "$userStreak Day Streak",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(
