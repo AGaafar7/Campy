@@ -93,6 +93,11 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildContinueLearningList(),
               //_buildSectionTitle("Recent Achievement"),
               //_buildAchievementGrid(),
+              //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTcyNjE4NThiZjJhNmIyYTJiODRiNzIiLCJpYXQiOjE3NjkxMzAxMDAsImV4cCI6MTc2OTczNDkwMH0.05XbGG-6s-D7tf-DYR9fAp_Fga84e7BMeA2Ud3Tws9A
+              //Free Course
+              //CAMP-FREE : 6972c9c9e77da463e4be44f3
+              //paid course
+              //Flat PRO: 6972ca04e77da463e4be44f6
               _buildSectionTitle("Badges & Certificates"),
               _buildBadgesSection(),
               const SizedBox(height: 120),
