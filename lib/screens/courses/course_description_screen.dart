@@ -7,7 +7,6 @@ import 'package:campy/screens/payment/paymob_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:campy/api/campy_backend_manager.dart';
 import 'package:http/http.dart' as http;
-import 'package:webview_flutter/webview_flutter.dart';
 
 class CourseDescriptionScreen extends StatefulWidget {
   final dynamic course;

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:campy/app_state.dart';
-import 'package:campy/api/campy_backend_manager.dart';
 import 'package:campy/config.dart';
 import 'package:campy/screens/courses/lesson_article_screen.dart';
 import 'package:campy/screens/courses/lesson_video_screen.dart';

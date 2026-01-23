@@ -53,7 +53,7 @@ class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
         final enrolledData = jsonDecode(results[1].body)['data'] as List;
 
         // Parse progress data to find completed courses
-        final progressResponse = results[2] as http.Response;
+        final progressResponse = results[2];
         Set<String> completedIds = {};
         if (progressResponse.statusCode == 200) {
           final List progressData = jsonDecode(progressResponse.body)['data'];

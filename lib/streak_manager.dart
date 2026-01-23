@@ -22,7 +22,7 @@ class StreakManager {
       // User already opened the app today, don't change anything
       return currentStreak;
     } else {
-      DateTime lastDate = DateTime.parse(lastLogin);
+      DateTime.parse(lastLogin);
       DateTime yesterday = now.subtract(const Duration(days: 1));
       String yesterdayString =
           "${yesterday.year}-${yesterday.month}-${yesterday.day}";

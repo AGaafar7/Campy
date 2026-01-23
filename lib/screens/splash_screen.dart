@@ -1,6 +1,5 @@
 import 'package:campy/app_state.dart';
 import 'package:campy/screens/auth/register_screen.dart';
-import 'package:campy/screens/home_screen.dart';
 import 'package:campy/screens/navigation_manager_screen.dart';
 import 'package:campy/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
