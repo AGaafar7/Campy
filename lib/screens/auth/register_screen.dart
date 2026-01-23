@@ -19,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool _isObscured = true;
   bool? isTermsAgreed = false;
   @override
   Widget build(BuildContext context) {
@@ -115,7 +116,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       hintText: "Password",
-                      suffixIcon: Icon(Icons.password_rounded),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isObscured
+                              ? Icons.visibility_off_rounded
+                              : Icons.visibility_rounded,
+                          color: Colors.black54,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscured = !_isObscured;
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ),

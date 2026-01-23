@@ -18,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
+  bool _isObscured = true;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextField(
                     controller: passwordController,
                     keyboardType: TextInputType.visiblePassword,
-                    obscureText: true,
+                    obscureText: _isObscured,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Color.fromARGB(255, 226, 226, 226),
@@ -96,7 +96,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       hintText: "Password",
-                      suffixIcon: Icon(Icons.password_rounded),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isObscured
+                              ? Icons.visibility_off_rounded
+                              : Icons.visibility_rounded,
+                          color: Colors.black54,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscured = !_isObscured;
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ),
